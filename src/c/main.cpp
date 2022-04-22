@@ -10,9 +10,6 @@ int main(int argc, char* argv[])
     unsigned short size[] = {128, 128};
     Preprocessor preprocessor(size);
 
-    string path;
-    cin >> path;
-    preprocessor.process(path);
-
+    normalInput(&preprocessor);
     return 0;
 }
