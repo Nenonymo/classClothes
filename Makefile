@@ -1,3 +1,5 @@
+# Makefile written by Nemo chentre, Umea University and University cote-d'azur
+
 SRC = ./src/c
 INC = ./include
 

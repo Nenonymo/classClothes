@@ -29,3 +29,10 @@ cv::Mat resizeKeepRatio(cv::Mat image, short unsigned* size);
 
 void normalInput(Preprocessor* preprocessor);
 void csvInput(Preprocessor* preprocessor, std::string path);
+
+
+
+//Code written by:
+//      - Nemo Chentre
+//
+// Last modified: 25/04/2022

@@ -19,17 +19,27 @@ void Preprocessor::process(string path, unsigned short* rawBbox)
    //Input debugging
     cout << this->inPrefix + path << endl;
 
-   //Picture loading
-    Mat inpImg = imread(inPrefix + path);
-
-   //Crop picture according to bbox
+   //Picture loading and bbox computations
+    Mat image = imread(inPrefix + path);
     short unsigned* bbox = simplifyBbox(rawBbox);
-    Mat crop = inpImg(Range(bbox[1], bbox[3]), Range(bbox[0], bbox[2]));
-    delete[] bbox;
 
-   //Resizing with borders
+   //Generate the cropped resized picture
+    Mat crop = image(Range(bbox[1], bbox[3]), Range(bbox[0], bbox[2]));
     Mat cropSized = resizeKeepRatio(crop, this->size);
-    imwrite(this->outPrefix + path, cropSized);
+    imwrite(this->outPrefix + "crop_" + path, cropSized);
+
+    /*
+   //Generate the wavelet resized picture
+    Mat wavelets;
+    imwrite(this->outPrefix + "wave_" + path, wavelets);
+
+   //Generate the contout resized picture
+    Mat contour;
+    imwrite(this->outPrefix + "cont_" + path, contour);
+    */
+
+   //Clean after computations
+    delete[] bbox;
 }
 
 short unsigned* simplifyBbox(short unsigned* bbox)
@@ -113,3 +123,10 @@ void csvInput(Preprocessor* preprocessor, string path)
     }
     delete[] bbox;
 }
+
+
+
+//Code written by:
+//      - Nemo Chentre
+//
+// Last modified: 25/04/2022
