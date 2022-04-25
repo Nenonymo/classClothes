@@ -1,3 +1,4 @@
 data/Datasets_Enhancy
 *.o
 Tmp/*
+vgcore.*

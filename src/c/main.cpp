@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     unsigned short size[] = {128, 128};
-    Preprocessor preprocessor(size);
+    Preprocessor preprocessor(size, "Tmp/input/", "Tmp/output/");
 
     normalInput(&preprocessor);
     return 0;

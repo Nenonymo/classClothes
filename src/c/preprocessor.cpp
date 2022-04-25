@@ -3,35 +3,78 @@
 using namespace std;
 using namespace cv;
 
-Preprocessor::Preprocessor(unsigned short _size[2])
+Preprocessor::Preprocessor(unsigned short _size[2], string inP, string outP)
 {
     this->size = _size;
+
+    this->inPrefix = inP;
+    this->outPrefix = outP;
 }
 
-void Preprocessor::process(string path, unsigned short* bbox)
+void Preprocessor::process(string path, unsigned short* rawBbox)
 {
-    cout << path << endl;
+    //Main picture preprocessing function
+    //this function was designed to be able to run asynchronously
 
-    for (int i = 0; i < 8; i++) {cout << bbox[i] << " ";}
-    cout << endl;
+   //Input debugging
+    cout << this->inPrefix + path << endl;
 
-    //Mat inpImg = imread(path);
-    //cout << inpImg.size().width << inpImg.size().height << endl;
+   //Picture loading
+    Mat inpImg = imread(inPrefix + path);
+
+   //Crop picture according to bbox
+    short unsigned* bbox = simplifyBbox(rawBbox);
+    Mat crop = inpImg(Range(bbox[1], bbox[3]), Range(bbox[0], bbox[2]));
+    delete[] bbox;
+
+   //Resizing with borders
+    Mat cropSized = resizeKeepRatio(crop, this->size);
+    imwrite(this->outPrefix + path, cropSized);
+}
+
+short unsigned* simplifyBbox(short unsigned* bbox)
+{
+    //Process the bbox to turn it into the smallest square including
+    // every points of the stated bbox.
+    //Output a 2 points (4 numbers) bbox and delete the input array.
+
+    short unsigned* newBbox = new short unsigned[4]; //deallocated in process
+    //Compute
+    newBbox[0] = min(min(bbox[0], bbox[2]), min(bbox[4], bbox[6]));
+    newBbox[1] = min(min(bbox[1], bbox[3]), min(bbox[5], bbox[7]));
+    newBbox[2] = max(max(bbox[0], bbox[2]), max(bbox[4], bbox[6]));
+    newBbox[3] = max(max(bbox[1], bbox[3]), max(bbox[5], bbox[7]));
+    delete[] bbox; //free the inputed bbox allocated before calling preprocess
+    return newBbox;
+}
+
+Mat resizeKeepRatio(Mat image, short unsigned* size)
+{
+    Mat output;
+    double scaleFactor = max((image.rows/(double)size[0]), (image.cols/(double)size[1])); //Compute scaling factor
+    short unsigned dstSize[2] = {image.cols/scaleFactor, image.rows/scaleFactor}; //Compute destination size with the good aspect ration
+    resize(image, output, Size(dstSize[0], dstSize[1]), INTER_LINEAR);
+    unsigned short borders[4] = {(size[0]-output.cols)/2+(size[0]-output.cols)%2,
+                                (size[0]-output.cols)/2,
+                                (size[1]-output.rows)/2+(size[1]-output.rows)%2,
+                                (size[1]-output.rows)/2};
+    printf("%d:%d, %d %d %d %d\n", output.cols, output.rows, borders[2], borders[3], borders[0], borders[1]);
+    copyMakeBorder(output, output, borders[2], borders[3], borders[0], borders[1], BORDER_REPLICATE);
+    return output;
 }
 
 void normalInput(Preprocessor* preprocessor)
 {
     unsigned int n;
     cin >> n;
-    short unsigned* bbox = new short unsigned[8];
     for (unsigned int i = 0; i < n; i++)
     {
         string file;
         cin >> file;
+        short unsigned* bbox = new short unsigned[8]; //deallocated in simplifyBbox
         for (unsigned int j = 0; j < 8; j++) {cin >> bbox[j]; }
         preprocessor->process(file, bbox);
     }
-    delete[] bbox;
 }
 
 void csvInput(Preprocessor* preprocessor, string path)
