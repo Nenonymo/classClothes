@@ -21,13 +21,12 @@ def load_data():
         csvreader = csv.reader(csvfile)
         headings = next(csvreader)
         for row in csvreader:
-            if i == 10: break
+            if i == 100: break
             labels.append(label_cleaner(row[1]))
             img = cv2.imread(IMAGEPATH + row[0])
             images.append(img)
             i += 1
 
-    print(*labels, sep = "\n")
     return images, labels
 
 
