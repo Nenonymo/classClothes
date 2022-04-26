@@ -2,10 +2,13 @@
 
 SRC = ./src/c
 INC = ./include
+TOOL = ./tools
 
 TARGET = labeller
 
-OBJS = $(SRC)/preprocessor.o \
+OBJS = $(TOOL)/fileSyst.o \
+       $(SRC)/wavelet.o \
+       $(SRC)/preprocessor.o \
        $(SRC)/main.o
 
 CXX = g++
@@ -19,7 +22,7 @@ CVFLAGS = `pkg-config --cflags opencv4`
 LCVFLAGS = `pkg-config --libs opencv4`
 
 #Include & local libs flags
-IFLAGS = -I${INC}
+IFLAGS = -I${INC} -I${TOOL}
 LFLAGS = -lstdc++
 
 #Compiling flags

@@ -7,6 +7,9 @@
 #include <fstream>
 #include <algorithm>
 
+#include "fileSyst.h"
+#include "wavelet.h"
+
 class Preprocessor
 {
     public:

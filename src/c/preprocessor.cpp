@@ -17,7 +17,8 @@ void Preprocessor::process(string path, unsigned short* rawBbox)
     //this function was designed to be able to run asynchronously
 
    //Input debugging
-    cout << this->inPrefix + path << endl;
+    string outPath = outPrefix + path.substr(0, path.find_last_of("/")+1);
+    string outName = path.substr(path.find_last_of("/")+1);
 
    //Picture loading and bbox computations
     Mat image = imread(inPrefix + path);
@@ -25,19 +26,26 @@ void Preprocessor::process(string path, unsigned short* rawBbox)
 
    //Generate the cropped resized picture
     Mat crop = image(Range(bbox[1], bbox[3]), Range(bbox[0], bbox[2]));
-    Mat cropSized = resizeKeepRatio(crop, this->size);
-    imwrite(this->outPrefix + "crop_" + path, cropSized);
-
+    crop = resizeKeepRatio(crop, this->size);
+   
     /*
    //Generate the wavelet resized picture
     Mat wavelets;
-    imwrite(this->outPrefix + "wave_" + path, wavelets);
-
-   //Generate the contout resized picture
-    Mat contour;
-    imwrite(this->outPrefix + "cont_" + path, contour);
+    crop.copyTo(wavelets);
+    genWavelets(crop, wavelets, 4);
     */
 
+
+    /*
+   //Generate the contout resized picture
+    Mat contour;
+    */
+
+    //check if path exists
+    imwrite(outPath + "crop_" + outName, crop);
+    //imwrite(outPath + "wave_" + outName, wavelets);
+    //imwrite(outPath + "cont_" + outName, contour);
+    
    //Clean after computations
     delete[] bbox;
 }
@@ -68,7 +76,6 @@ Mat resizeKeepRatio(Mat image, short unsigned* size)
                                 (size[0]-output.cols)/2,
                                 (size[1]-output.rows)/2+(size[1]-output.rows)%2,
                                 (size[1]-output.rows)/2};
-    printf("%d:%d, %d %d %d %d\n", output.cols, output.rows, borders[2], borders[3], borders[0], borders[1]);
     copyMakeBorder(output, output, borders[2], borders[3], borders[0], borders[1], BORDER_REPLICATE);
     return output;
 }
@@ -129,4 +136,4 @@ void csvInput(Preprocessor* preprocessor, string path)
 //Code written by:
 //      - Nemo Chentre
 //
-// Last modified: 25/04/2022
+// Last modified: 26/04/2022
