@@ -3,6 +3,8 @@
 using namespace std;
 using namespace cv;
 
+#define WAVELET_LEVEL 4
+
 Preprocessor::Preprocessor(unsigned short _size[2], string inP, string outP)
 {
     this->size = _size;
@@ -155,4 +157,4 @@ void csvInput(Preprocessor* preprocessor, string path)
 //Code written by:
 //      - Nemo Chentre
 //
-// Last modified: 26/04/2022
+// Last modified: 27/04/2022
