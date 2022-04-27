@@ -32,7 +32,7 @@ T garrotShrink(T d, T t)
     return (d - ((t*t)/d));
 }
 
-void genWavelets(Mat &src, Mat &dst, unsigned int nIter)
+void haarWavelets(Mat &src, Mat &dst, unsigned int nIter)
 {
     float c, dh, dv, dd;
     assert(src.type() == CV_32FC1);
@@ -42,9 +42,9 @@ void genWavelets(Mat &src, Mat &dst, unsigned int nIter)
 
     for (unsigned int k = 0; k < nIter; k++)
     {
-        for (unsigned int y = 0; y < height; y++)
+        for (unsigned int y = 0; y < height>>(k+1); y++)
         {
-            for (unsigned int x = 0; x < width; x++)
+            for (unsigned int x = 0; x < width>>(k+1); x++)
             {
                 c=(src.at<float>(2*y,2*x)+src.at<float>(2*y,2*x+1)+src.at<float>(2*y+1,2*x)+src.at<float>(2*y+1,2*x+1))*0.5;
                 dst.at<float>(y,x)=c;
@@ -63,11 +63,63 @@ void genWavelets(Mat &src, Mat &dst, unsigned int nIter)
     }
 }
 
+void invHaarWavelet(Mat &src, Mat &dst, unsigned int nIter, int SHRINKAGE_TYPE=0, float SHRINKAGE_T=50)
+{
+    float c, dh, dv, dd;
+    assert(dst.type() == CV_32FC1);
+    assert(src.type() == CV_32FC1);
+    unsigned int width = src.cols;
+    unsigned int height = src.rows;
+
+    for (unsigned int k = nIter; k > 0; k--)
+    {
+        for (unsigned int y = 0; y < height>>k; y++)
+        {
+            for (unsigned int x = 0; x < width>>k; x++)
+            {
+                c = src.at<float>(y, x);
+                dh = src.at<float>(y, x+(width>>k));
+                dv = src.at<float>(y+(height>>k), x);
+                dd = src.at<float>(y+(height>>k), x+(width>>k));
+
+                switch (SHRINKAGE_TYPE)
+                {
+                    case HARD:
+                        dh=hardShrink<float>(dh, SHRINKAGE_T);
+                        dv=hardShrink<float>(dv, SHRINKAGE_T);
+                        dd=hardShrink<float>(dd, SHRINKAGE_T);
+                        break;
+                    case SOFT:
+                        dh=softShrink<float>(dh, SHRINKAGE_T);
+                        dv=softShrink<float>(dh, SHRINKAGE_T);
+                        dd=hardShrink<float>(dd, SHRINKAGE_T);
+                        break;
+                    case GARROT:
+                        dh=garrotShrink<float>(dh, SHRINKAGE_T);
+                        dv=garrotShrink<float>(dv, SHRINKAGE_T);
+                        dd=garrotShrink<float>(dd, SHRINKAGE_T);
+                        break;
+                }
+                dst.at<float>(y*2,x*2)=0.5*(c+dh+dv+dd);
+                dst.at<float>(y*2,x*2+1)=0.5*(c-dh+dv-dd);
+                dst.at<float>(y*2+1,x*2)=0.5*(c+dh-dv-dd);
+                dst.at<float>(y*2+1,x*2+1)=0.5*(c-dh-dv+dd);
+            }
+        }
+        Mat C=src(Rect(0,0,width>>(k-1),height>>(k-1)));
+        Mat D=dst(Rect(0,0,width>>(k-1),height>>(k-1)));
+        D.copyTo(C);
+    }
+}
 
 
-
-
-
+void genWavelets(Mat &src, Mat &dstUnf, Mat &dstF, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T)
+{
+    Mat tmp = Mat(src.cols, src.rows, CV_32FC1);
+    haarWavelets(src, dstUnf, nIter);
+    dstUnf.copyTo(tmp);
+    invHaarWavelet(tmp, dstF, nIter, SHRINKAGE_TYPE, SHRINKAGE_T);
+}
 
 
 

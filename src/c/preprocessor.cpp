@@ -17,8 +17,16 @@ void Preprocessor::process(string path, unsigned short* rawBbox)
     //this function was designed to be able to run asynchronously
 
    //Input debugging
+    string inPath = inPrefix + path;
     string outPath = outPrefix + path.substr(0, path.find_last_of("/")+1);
     string outName = path.substr(path.find_last_of("/")+1);
+
+    if (!doesPathExist(inPath))
+    {
+        delete[] rawBbox; 
+        printf("Error: File `%s` not reachable !\n", inPath.c_str());
+        return;
+    }
 
    //Picture loading and bbox computations
     Mat image = imread(inPrefix + path);
@@ -27,14 +35,17 @@ void Preprocessor::process(string path, unsigned short* rawBbox)
    //Generate the cropped resized picture
     Mat crop = image(Range(bbox[1], bbox[3]), Range(bbox[0], bbox[2]));
     crop = resizeKeepRatio(crop, this->size);
-   
-    /*
-   //Generate the wavelet resized picture
-    Mat wavelets;
-    crop.copyTo(wavelets);
-    genWavelets(crop, wavelets, 4);
-    */
 
+    //Generate the gray frame
+    Mat grayFrame = Mat(crop.cols, crop.rows, CV_8UC1);
+    cvtColor(crop, grayFrame, COLOR_BGR2GRAY);
+   
+   //Generate the wavelet resized picture
+    Mat waveSrc = Mat(crop.rows, crop.cols, CV_32FC1);
+    Mat waveUnFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
+    Mat waveFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
+    grayFrame.convertTo(waveSrc, CV_32FC1);
+    genWavelets(waveSrc, waveUnFiltered, waveFiltered, 4, HARD, 30);
 
     /*
    //Generate the contout resized picture
@@ -42,8 +53,11 @@ void Preprocessor::process(string path, unsigned short* rawBbox)
     */
 
     //check if path exists
+    createPathIfNotExist(outPath);
     imwrite(outPath + "crop_" + outName, crop);
-    //imwrite(outPath + "wave_" + outName, wavelets);
+    imwrite(outPath + "gray_" + outName, grayFrame);
+    imwrite(outPath + "wav1_" + outName, waveUnFiltered);
+    imwrite(outPath + "wav2_" + outName, waveFiltered);
     //imwrite(outPath + "cont_" + outName, contour);
     
    //Clean after computations
@@ -86,6 +100,11 @@ void normalInput(Preprocessor* preprocessor)
     cin >> n;
     for (unsigned int i = 0; i < n; i++)
     {
+        if (i%(n/50) == 0)
+        {
+            cout << "[" << string(((i/(double)n))*50, '|') << string(((1-(i/(double)n))*50), '.') << "}" << endl;
+            //printf("Processing... Please wait. Only %.3f percent left...\n", (1-(i/(double)n))*100);
+        }
         string file;
         cin >> file;
         short unsigned* bbox = new short unsigned[8]; //deallocated in simplifyBbox

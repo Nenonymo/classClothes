@@ -2,4 +2,10 @@
 
 #include <opencv2/opencv.hpp>
 
-void genWavelets(cv::Mat &src, cv::Mat &dst, unsigned int nIter);
+#define NONE 0
+#define HARD 1
+#define SOFT 2
+#define GARROT 3
+
+
+void genWavelets(cv::Mat &src, cv::Mat &dstUnf, cv::Mat &dstF, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T);
