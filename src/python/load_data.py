@@ -10,6 +10,8 @@ def label_cleaner(l):
         if not ("Null" in label or "null" in label or "nan" in label):
             label = label.replace("'", "")
             label = label.replace(" ", "")
+            label = label.replace("[", "")
+            label = label.replace("]", "")
             ret.append(label)
     return ret
 
@@ -21,7 +23,7 @@ def load_data():
         csvreader = csv.reader(csvfile)
         headings = next(csvreader)
         for row in csvreader:
-            if i == 100: break
+            if i == 200: break # TODO debug
             labels.append(label_cleaner(row[1]))
             img = cv2.imread(IMAGEPATH + row[0])
             images.append(img)
