@@ -14,7 +14,7 @@ class Preprocessor
 {
     public:
         Preprocessor(unsigned short size[2], std::string inP = "", std::string outP = "");
-        void process(std::string path, unsigned short* bbox);
+        void process(unsigned int id, std::string path, unsigned short* bbox);
     private:
         //Innit args
         unsigned short* size;
