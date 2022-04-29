@@ -2,7 +2,7 @@ import csv
 import cv2
 CSVPATH = r"../../data/csv/export_labels_working.csv"
 IMAGEPATH = r"../../data/Datasets_Enhancy/processed/"
-IMAGEPREFIX = [ r"crop_" ]
+IMAGEPREFIX = [ r"crop__" ]
 
 def label_cleaner(l):
     labels = l[1:len(l)-1].split(",")
@@ -36,7 +36,7 @@ def load_data():
                 # Image labels
                 labels.append(label_cleaner(row[1]))
                 # Image file
-                img = cv2.imread(IMAGEPATH + base_path + pre + img_name)
+                img = cv2.imread(IMAGEPATH + pre + img_name)
                 img = img[:,:,::-1] # BGR -> RGB
                 images.append(img)
                 i += 1
