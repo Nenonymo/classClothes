@@ -6,6 +6,11 @@ from operator import itemgetter
 
 def label_cleaner(l, labelFilter):
     labels = l[1:len(l)-1].split(",")
+    if len(labelFilter) == 1: 
+        labels = [itemgetter(*labelFilter)(labels)]
+    elif len(labelFilter) > 1:
+        labels = itemgetter(*labelFilter)(labels)
+
     ret = []
     for label in labels:
         if not ("Null" in label or "null" in label or "nan" in label):
@@ -13,7 +18,6 @@ def label_cleaner(l, labelFilter):
             label = label.replace(" ", "")
             label = label.replace("[", "")
             label = label.replace("]", "")
-            if len(labelFilter) > 0: label = itemgetter(*labelFilter)(label)
             ret.append(label)
     return ret
 
@@ -42,6 +46,9 @@ def load_data(count=-1, img_type=[], labelFilter=[]):
                 images.append(img)
             loops += 1
 
+    print("Loops: {}".format(loops))
+    print("Types: {}".format(IMAGEPREFIX))
+    print("Labels: {}".format(labelFilter))
     return images, labels
 
 
