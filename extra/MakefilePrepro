@@ -9,7 +9,7 @@ TARGET = preprocessor
 OBJS = $(TOOL)/fileSyst.o \
        $(SRC)/wavelet.o \
        $(SRC)/preprocessor.o \
-       $(SRC)/main.o
+       $(SRC)/mainPrepro.o
 
 CXX = g++
 

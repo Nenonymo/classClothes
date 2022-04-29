@@ -11,17 +11,21 @@ Preprocessor::Preprocessor(unsigned short _size[2], string inP, string outP)
 
     this->inPrefix = inP;
     this->outPrefix = outP;
+
+    createPathIfNotExist(outP);
 }
 
-void Preprocessor::process(string path, unsigned short* rawBbox)
+void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox)
 {
     //Main picture preprocessing function
     //this function was designed to be able to run asynchronously
 
    //Input debugging
     string inPath = inPrefix + path;
-    string outPath = outPrefix + path.substr(0, path.find_last_of("/")+1);
-    string outName = path.substr(path.find_last_of("/")+1);
+    //string outPath = outPrefix + path.substr(0, path.find_last_of("/")+1);
+    string outPath = outPrefix;
+    //string outName = path.substr(path.find_last_of("/")+1);
+    string outName = "_" + to_string(id) + ".jpg";
 
     if (!doesPathExist(inPath))
     {
@@ -99,6 +103,8 @@ Mat resizeKeepRatio(Mat image, short unsigned* size)
 void normalInput(Preprocessor* preprocessor)
 {
     unsigned int n;
+    unsigned int id;
+    string file;
     cin >> n;
     for (unsigned int i = 0; i < n; i++)
     {
@@ -107,14 +113,15 @@ void normalInput(Preprocessor* preprocessor)
             cout << "[" << string(((i/(double)n))*50, '|') << string(((1-(i/(double)n))*50), '.') << "}" << endl;
             //printf("Processing... Please wait. Only %.3f percent left...\n", (1-(i/(double)n))*100);
         }
-        string file;
+        cin >> id;
         cin >> file;
         short unsigned* bbox = new short unsigned[8]; //deallocated in simplifyBbox
         for (unsigned int j = 0; j < 8; j++) {cin >> bbox[j]; }
-        preprocessor->process(file, bbox);
+        preprocessor->process(id, file, bbox);
     }
 }
 
+/*
 void csvInput(Preprocessor* preprocessor, string path)
 {
     //Fucking annoying function that doesn't work
@@ -150,7 +157,7 @@ void csvInput(Preprocessor* preprocessor, string path)
         preprocessor->process(file, bbox);
     }
     delete[] bbox;
-}
+}*/
 
 
 

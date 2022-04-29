@@ -10,9 +10,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    unsigned short size[] = {128, 128};
+    unsigned short size[] = {256, 256};
     Preprocessor preprocessor(size, INPUT_PREFIX, OUTPUT_PREFIX);
-
     normalInput(&preprocessor);
     return 0;
 }
