@@ -6,9 +6,7 @@ TOOL = ./tools
 
 TARGET = labeller
 
-OBJS = $(TOOL)/fileSyst.o \
-       $(SRC)/wavelet.o \
-       $(SRC)/preprocessor.o \
+OBJS = $(SRC)/processesManagement.o \
        $(SRC)/main.o
 
 CXX = g++
