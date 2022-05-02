@@ -1,23 +1,49 @@
 #!/bin/bash
 
-fifo_name="Tmp/inFifo";
+inFifo="Tmp/inFifo";
+outFifo="Tmp/outFifo";
+needHelp=0;
+serverStart=0;
+serverKill=0;
+serverPath=".";
+serverCore=1;
+filePath=${@: -2};
+fileArg=${@: -1};
 
-outStr="0 $1 $2"
 
+while getopts SKP:C:hi:o: flag
+do
+	case "${flag}" in
+		S) serverStart=1;;
+		K) serverKill=1;;
+		P) serverPath=${OPTARG};;
+		C) serverCore=${OPTARG};;
+		h) needHelp=1;;
+		i) inFifo=${OPTARG};;
+		o) outFifo=${OPTARG};;
+	esac
+done
 
-
-if [[ "$1" == "kill" ]]; then
-	echo -1 >$fifo_name;
-else
-	echo $outStr >$fifo_name;
+if [[ "$serverKill" == 1 ]]; then
+	echo "Shutting down server...";
 fi
 
-echo "Communication complete !\n"
+#Server Start
+if [[ "$serverStart" == 1 ]]; then
+	echo "Starting server...";
+	`gnome-terminal -e "$serverPath/labeller $inFifo $outFifo"`;
+	sleep 2;
+	echo "Initializing...";
+fi
 
+#Send data to the server
+echo "$serverKill $filePath $fileArg" > $inFifo;
+echo `cat $outFifo`;
 
-echo (cat Tmp/outFifo);
-
-
+if [[ "$serverKill" == 1 ]]; then
+	rm $inFifo;
+	rm $outFifo;
+fi
 
 #Code written by:
 #      - Nemo Chentre

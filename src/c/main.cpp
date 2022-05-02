@@ -8,13 +8,25 @@ int main(int argc, char* argv[])
     //Demonize
 
     //input data from named pipe
-    char* inFifo = "Tmp/inFifo";
+    char* inFifo = argv[1];
     mkfifo(inFifo, 0666);
-    char* outFifo = "Tmp/outFifo";
+    char* outFifo = argv[2];
     mkfifo(outFifo, 0666);
 
-    int outSign;
-    outSign = processInput(inFifo, outFifo);
+    cout << inFifo << " " << outFifo << endl;
+
+    //sendOut("Server initialized!", 20, outFifo);
+    while (true)
+    {
+        int outSign;
+        InputData* data = new InputData;
+        outSign = processInput(inFifo, outFifo, data);
+        if (outSign == -1)
+        {break; }
+        //task
+        process1Round(data);
+    }
+    cout << "Server stopped" << endl;
 
     return 0;
 }

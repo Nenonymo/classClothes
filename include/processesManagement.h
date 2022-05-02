@@ -14,17 +14,20 @@ struct inputD
 {
     std::string picturePath;
     std::string labelClass;
-    unsigned int id;
-    unsigned int priority;
 };
 typedef struct inputD InputData;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo);
+int processInput(char* inFifo, char* outFifo, InputData* data);
 
-InputData input1Round();
+void input1Round(std::stringstream& buffer, InputData* data);
 
+void process1Round(InputData* data);
+
+int sendOut(const char* buffer, unsigned int buffSize, char* fifo);
+
+bool demonize();
 
 
 //Code written by:
