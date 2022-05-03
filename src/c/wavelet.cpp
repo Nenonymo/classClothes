@@ -112,7 +112,6 @@ void invHaarWavelet(Mat &src, Mat &dst, unsigned int nIter, int SHRINKAGE_TYPE=0
     }
 }
 
-
 void genWavelets(Mat &src, Mat &dstUnf, Mat &dstF, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T)
 {
     Mat tmp = Mat(src.cols, src.rows, CV_32FC1);
@@ -132,3 +131,9 @@ template double softShrink<double>(double, double);
 
 template float hardShrink<float>(float, float);
 template double hardShrink<double>(double, double);
+
+
+//Code written by:
+//      - Nemo Chentre
+//
+//Last modified 29/04/2022
