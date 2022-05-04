@@ -8,22 +8,27 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#include "preprocessor.h"
+
 #define BUFF_SIZE 120
 
-struct inputD
+struct jobData
 {
+    unsigned int jobId;
     std::string picturePath;
     std::string labelClass;
 };
-typedef struct inputD InputData;
+typedef struct jobData jobData;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo, InputData* data);
+int processInput(char* inFifo, char* outFifo, jobData* data);
 
-void input1Round(std::stringstream& buffer, InputData* data);
+void input1Round(std::stringstream& buffer, jobData* data);
 
-void process1Round(InputData* data);
+void cleanPictures(unsigned int jobId, Preprocessor* prepro);
+
+void process1Round(jobData* data, Preprocessor* prepro);
 
 int sendOut(const char* buffer, unsigned int buffSize, char* fifo);
 

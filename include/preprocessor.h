@@ -15,6 +15,9 @@ class Preprocessor
     public:
         Preprocessor(unsigned short size[2], std::string inP = "", std::string outP = "");
         void process(unsigned int id, std::string path, unsigned short* bbox);
+        void processWithoutBbox(unsigned int id, std::string path);
+
+        std::string getOutPath();
     private:
         //Innit args
         unsigned short* size;

@@ -4,7 +4,7 @@ using namespace std;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo, InputData* data)
+int processInput(char* inFifo, char* outFifo, jobData* data)
 {
    //Input data
     //Open the input fifo
@@ -46,16 +46,34 @@ int processInput(char* inFifo, char* outFifo, InputData* data)
     return 0;
 }
 
-void input1Round(stringstream& buffer, InputData* data)
+void input1Round(stringstream& buffer, jobData* data)
 {
     buffer >> data->picturePath;
     buffer >> data->labelClass;
 }
 
-void process1Round(InputData* data)
+void cleanPictures(unsigned int jobId, Preprocessor* prepro)
+{
+    string outP = prepro->getOutPath();
+    string filename = outP + "gray_" + to_string(jobId) + ".bmp";
+    remove(filename.c_str());
+    filename = outP + "crop_" + to_string(jobId) + ".bmp";
+    remove(filename.c_str());
+    filename = outP + "wav1_" + to_string(jobId) + ".bmp";
+    remove(filename.c_str());
+    filename = outP + "wav2_" + to_string(jobId) + ".bmp";
+    remove(filename.c_str());
+}
+
+void process1Round(jobData* data, Preprocessor* prepro)
 {
     //work
     printf("processing picture %s with arg %s\n", data->picturePath.c_str(), data->labelClass.c_str());
+    
+    prepro->processWithoutBbox(data->jobId, data->picturePath);
+
+    printf("Picture preprocessed\n");
+    
     delete data;
 }
 

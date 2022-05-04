@@ -15,6 +15,8 @@ Preprocessor::Preprocessor(unsigned short _size[2], string inP, string outP)
     createPathIfNotExist(outP);
 }
 
+string Preprocessor::getOutPath() {return this->outPrefix; }
+
 void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox)
 {
     //Main picture preprocessing function
@@ -25,7 +27,7 @@ void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox
     //string outPath = outPrefix + path.substr(0, path.find_last_of("/")+1);
     string outPath = outPrefix;
     //string outName = path.substr(path.find_last_of("/")+1);
-    string outName = "_" + to_string(id) + ".jpg";
+    string outName = to_string(id) + ".jpg";
 
     if (!doesPathExist(inPath))
     {
@@ -68,6 +70,55 @@ void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox
     
    //Clean after computations
     delete[] bbox;
+}
+
+void Preprocessor::processWithoutBbox(unsigned int id, string path)
+{
+    //Main picture preprocessing function
+    //this function was designed to be able to run asynchronously
+
+   //Input debugging
+    string inPath = inPrefix + path;
+    //string outPath = outPrefix + path.substr(0, path.find_last_of("/")+1);
+    string outPath = outPrefix;
+    //string outName = path.substr(path.find_last_of("/")+1);
+    string outName = to_string(id) + ".bmp";
+
+    if (!doesPathExist(inPath))
+    {
+        printf("Error: File `%s` not reachable !\n", inPath.c_str());
+        return;
+    }
+
+   //Picture loading and bbox computations
+    Mat image = imread(inPrefix + path);
+    image = resizeKeepRatio(image, this->size);
+    Mat crop = Mat(image.cols, image.rows, CV_32FC1);
+    image.copyTo(crop);
+
+    //Generate the gray frame
+    Mat grayFrame = Mat(crop.cols, crop.rows, CV_8UC1);
+    cvtColor(crop, grayFrame, COLOR_BGR2GRAY);
+   
+   //Generate the wavelet resized picture
+    Mat waveSrc = Mat(crop.rows, crop.cols, CV_32FC1);
+    Mat waveUnFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
+    Mat waveFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
+    grayFrame.convertTo(waveSrc, CV_32FC1);
+    genWavelets(waveSrc, waveUnFiltered, waveFiltered, 4, HARD, 30);
+
+    /*
+   //Generate the contout resized picture
+    Mat contour;
+    */
+
+    //check if path exists
+    createPathIfNotExist(outPath);
+    imwrite(outPath + "crop_" + outName, crop);
+    imwrite(outPath + "gray_" + outName, grayFrame);
+    imwrite(outPath + "wav1_" + outName, waveUnFiltered);
+    imwrite(outPath + "wav2_" + outName, waveFiltered);
+    //imwrite(outPath + "cont_" + outName, contour);
 }
 
 short unsigned* simplifyBbox(short unsigned* bbox)
