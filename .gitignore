@@ -5,3 +5,5 @@ vgcore.*
 export_labels_working.csv
 labeller
 extra/preprocessor
+
+src/python/.ipynb_checkpoints

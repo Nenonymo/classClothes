@@ -8,4 +8,4 @@
 #define GARROT 3
 
 
-void genWavelets(cv::Mat &src, cv::Mat &dstUnf, cv::Mat &dstF, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T);
+void genWavelets(cv::Mat &src, cv::Mat &dstV, cv::Mat &dstH, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T);

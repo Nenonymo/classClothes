@@ -63,7 +63,8 @@ void haarWavelets(Mat &src, Mat &dst, unsigned int nIter)
     }
 }
 
-void invHaarWavelet(Mat &src, Mat &dst, unsigned int nIter, int SHRINKAGE_TYPE=0, float SHRINKAGE_T=50)
+//Wavelet filtering
+/*void invHaarWavelet(Mat &src, Mat &dst, unsigned int nIter, int SHRINKAGE_TYPE=0, float SHRINKAGE_T=50)
 {
     float c, dh, dv, dd;
     assert(dst.type() == CV_32FC1);
@@ -110,14 +111,15 @@ void invHaarWavelet(Mat &src, Mat &dst, unsigned int nIter, int SHRINKAGE_TYPE=0
         Mat D=dst(Rect(0,0,width>>(k-1),height>>(k-1)));
         D.copyTo(C);
     }
-}
+}*/
 
-void genWavelets(Mat &src, Mat &dstUnf, Mat &dstF, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T)
+void genWavelets(Mat &src, Mat &dstV, Mat &dstH, unsigned int nIter, int SHRINKAGE_TYPE, float SHRINKAGE_T)
 {
+    //Not modular with the nIter :/
     Mat tmp = Mat(src.cols, src.rows, CV_32FC1);
-    haarWavelets(src, dstUnf, nIter);
-    dstUnf.copyTo(tmp);
-    invHaarWavelet(tmp, dstF, nIter, SHRINKAGE_TYPE, SHRINKAGE_T);
+    haarWavelets(src, tmp, nIter);
+    dstV = tmp(Range(src.cols/2, src.cols), Range(0, src.rows/2));
+    dstH = tmp(Range(0, src.cols/2), Range(src.rows/2, src.rows));
 }
 
 

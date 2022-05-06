@@ -42,6 +42,12 @@ void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox
 
    //Generate the cropped resized picture
     Mat crop = image(Range(bbox[1], bbox[3]), Range(bbox[0], bbox[2]));
+    unsigned short size2[2] = {this->size[0]*2, this->size[1]*2};
+    //resize to 2 times final size (for wavelets)
+    crop = resizeKeepRatio(crop, size2);
+    Mat waveSrc = Mat(crop.cols, crop.rows, CV_32FC1);
+    crop.copyTo(waveSrc);
+    //resize to final size
     crop = resizeKeepRatio(crop, this->size);
 
     //Generate the gray frame
@@ -49,11 +55,14 @@ void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox
     cvtColor(crop, grayFrame, COLOR_BGR2GRAY);
    
    //Generate the wavelet resized picture
-    Mat waveSrc = Mat(crop.rows, crop.cols, CV_32FC1);
-    Mat waveUnFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
-    Mat waveFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
-    grayFrame.convertTo(waveSrc, CV_32FC1);
-    genWavelets(waveSrc, waveUnFiltered, waveFiltered, 4, HARD, 30);
+    //Generate the gray wavelet source picture
+    Mat grayWavelet = Mat(waveSrc.cols, waveSrc.rows, CV_8UC1);
+    cvtColor(waveSrc, grayWavelet, COLOR_BGR2GRAY);
+    grayWavelet.convertTo(waveSrc, CV_32FC1);
+    //Generate the 2 wavelet pictures
+    Mat waveH = Mat(crop.cols, crop.rows, CV_32FC1);
+    Mat waveV = Mat(crop.cols, crop.rows, CV_32FC1);
+    genWavelets(waveSrc, waveH, waveV, 4, HARD, 30);
 
     /*
    //Generate the contout resized picture
@@ -64,8 +73,8 @@ void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox
     createPathIfNotExist(outPath);
     imwrite(outPath + "crop_" + outName, crop);
     imwrite(outPath + "gray_" + outName, grayFrame);
-    imwrite(outPath + "wav1_" + outName, waveUnFiltered);
-    imwrite(outPath + "wav2_" + outName, waveFiltered);
+    imwrite(outPath + "wavH_" + outName, waveH);
+    imwrite(outPath + "wavV_" + outName, waveV);
     //imwrite(outPath + "cont_" + outName, contour);
     
    //Clean after computations
@@ -90,8 +99,14 @@ void Preprocessor::processWithoutBbox(unsigned int id, string path)
         return;
     }
 
+    unsigned short size2[2] = {this->size[0]*2, this->size[1]*2};
    //Picture loading and bbox computations
     Mat image = imread(inPrefix + path);
+    //Resize to 2*final size (for wavelets)
+    image = resizeKeepRatio(image, size2);
+    Mat waveSrc = Mat(image.cols, image.rows, CV_32FC1);
+    image.copyTo(waveSrc);
+    //Resize to size (for final pictures)
     image = resizeKeepRatio(image, this->size);
     Mat crop = Mat(image.cols, image.rows, CV_32FC1);
     image.copyTo(crop);
@@ -101,11 +116,14 @@ void Preprocessor::processWithoutBbox(unsigned int id, string path)
     cvtColor(crop, grayFrame, COLOR_BGR2GRAY);
    
    //Generate the wavelet resized picture
-    Mat waveSrc = Mat(crop.rows, crop.cols, CV_32FC1);
-    Mat waveUnFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
-    Mat waveFiltered = Mat(crop.rows, crop.cols, CV_32FC1);
-    grayFrame.convertTo(waveSrc, CV_32FC1);
-    genWavelets(waveSrc, waveUnFiltered, waveFiltered, 4, HARD, 30);
+    //Transform the source picture to gray levels
+    Mat grayWavelet = Mat(waveSrc.cols, waveSrc.rows, CV_8UC1);
+    cvtColor(waveSrc, grayWavelet, COLOR_BGR2GRAY);
+    grayWavelet.convertTo(waveSrc, CV_32FC1);
+    //Generate the 2 wavelets pictures
+    Mat waveH = Mat(crop.cols, crop.rows, CV_32FC1);
+    Mat waveV = Mat(crop.cols, crop.rows, CV_32FC1);
+    genWavelets(waveSrc, waveH, waveV, 4, HARD, 30);
 
     /*
    //Generate the contout resized picture
@@ -116,8 +134,8 @@ void Preprocessor::processWithoutBbox(unsigned int id, string path)
     createPathIfNotExist(outPath);
     imwrite(outPath + "crop_" + outName, crop);
     imwrite(outPath + "gray_" + outName, grayFrame);
-    imwrite(outPath + "wav1_" + outName, waveUnFiltered);
-    imwrite(outPath + "wav2_" + outName, waveFiltered);
+    imwrite(outPath + "wavH_" + outName, waveH);
+    imwrite(outPath + "wavV_" + outName, waveV);
     //imwrite(outPath + "cont_" + outName, contour);
 }
 
