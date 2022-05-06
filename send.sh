@@ -43,6 +43,7 @@ echo `cat $outFifo`;
 if [[ "$serverKill" == 1 ]]; then
 	rm $inFifo;
 	rm $outFifo;
+	rm -rf 'Tmp/*';
 fi
 
 #Code written by:
