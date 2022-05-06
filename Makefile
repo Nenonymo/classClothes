@@ -8,6 +8,7 @@ TARGET = labeller
 
 OBJS = $(SRC)/wavelet.o \
        $(TOOL)/fileSyst.o \
+	   $(SRC)/pythonEmbedding.o \
        $(SRC)/preprocessor.o \
        $(SRC)/processesManagement.o \
        $(SRC)/main.o

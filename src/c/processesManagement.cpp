@@ -4,7 +4,7 @@ using namespace std;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo, jobData* data)
+int processInput(char* inFifo, char* outFifo, inpData* data)
 {
    //Input data
     //Open the input fifo
@@ -46,7 +46,7 @@ int processInput(char* inFifo, char* outFifo, jobData* data)
     return 0;
 }
 
-void input1Round(stringstream& buffer, jobData* data)
+void input1Round(stringstream& buffer, inpData* data)
 {
     buffer >> data->picturePath;
     buffer >> data->labelClass;
@@ -59,21 +59,31 @@ void cleanPictures(unsigned int jobId, Preprocessor* prepro)
     remove(filename.c_str());
     filename = outP + "crop_" + to_string(jobId) + ".bmp";
     remove(filename.c_str());
-    filename = outP + "wav1_" + to_string(jobId) + ".bmp";
+    filename = outP + "wavH_" + to_string(jobId) + ".bmp";
     remove(filename.c_str());
-    filename = outP + "wav2_" + to_string(jobId) + ".bmp";
+    filename = outP + "wavV_" + to_string(jobId) + ".bmp";
     remove(filename.c_str());
 }
 
-void process1Round(jobData* data, Preprocessor* prepro)
+void process1Round(inpData* data, Preprocessor* prepro)
 {
-    //work
-    printf("processing picture %s with arg %s\n", data->picturePath.c_str(), data->labelClass.c_str());
-    
+    //Preprocessing
+    //printf("processing picture %s with arg %s\n", data->picturePath.c_str(), data->labelClass.c_str());
     prepro->processWithoutBbox(data->jobId, data->picturePath);
+    //printf("Picture preprocessed\n");
 
-    printf("Picture preprocessed\n");
-    
+    //Prepare the data for the job
+    job_data* jobData = new job_data;
+    jobData->jobId = data->jobId;
+    jobData->tempDir = prepro->getOutPath().c_str();
+    jobData->givenLabel = data->labelClass.c_str();
+
+    //Process the job in the python blocks
+    if (blockJob(jobData) != 0) 
+    {cout << "Error in the python blocks" << endl; }
+
+    //Clean after the processing
+    cleanPictures(data->jobId, prepro);
     delete data;
 }
 
@@ -89,6 +99,17 @@ int sendOut(const char* buffer, unsigned int buffSize, char* fifo)
     write(fdo, buffer, buffSize);
     close(fdo);
     return 0;
+}
+
+void raiseError(char* buffer)
+{
+    cout << buffer << endl;
+    killProcess();
+}
+
+void raiseFatalError()
+{
+    //Do something
 }
 
 int killProcess()

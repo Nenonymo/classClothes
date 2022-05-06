@@ -32,7 +32,7 @@ fi
 if [[ "$serverStart" == 1 ]]; then
 	echo "Starting server...";
 	`gnome-terminal -e "$serverPath/labeller $inFifo $outFifo"`;
-	sleep 2;
+	sleep 1;
 	echo "Initializing...";
 fi
 

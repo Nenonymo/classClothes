@@ -16,6 +16,8 @@ int main(int argc, char* argv[])
     char* outFifo = argv[2];
     mkfifo(outFifo, 0666);
 
+    cout << "\033]0;Labeller-Server\007" << endl;
+
     //Start preprocessor
     unsigned short size[] = {128, 128};
     Preprocessor preprocessor(size, INPUT_PREFIX, OUTPUT_PREFIX);
@@ -28,7 +30,7 @@ int main(int argc, char* argv[])
         cout << "inputing job #" << jobId << endl;
 
         int outSign;
-        jobData* data = new jobData;
+        inpData* data = new inpData;
         data->jobId = jobId;
         outSign = processInput(inFifo, outFifo, data);
 
@@ -41,7 +43,6 @@ int main(int argc, char* argv[])
         jobId++;
     }
 
-    for(unsigned int i = 0; i <= jobId; i++) {cleanPictures(i, &preprocessor); }
     cout << "Server stopped" << endl;
 
     return 0;

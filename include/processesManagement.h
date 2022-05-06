@@ -9,26 +9,27 @@
 #include <sys/stat.h>
 
 #include "preprocessor.h"
+#include "pythonEmbedding.h"
 
 #define BUFF_SIZE 120
 
-struct jobData
+struct inpData
 {
     unsigned int jobId;
     std::string picturePath;
     std::string labelClass;
 };
-typedef struct jobData jobData;
+typedef struct inpData inpData;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo, jobData* data);
+int processInput(char* inFifo, char* outFifo, inpData* data);
 
-void input1Round(std::stringstream& buffer, jobData* data);
+void input1Round(std::stringstream& buffer, inpData* data);
 
 void cleanPictures(unsigned int jobId, Preprocessor* prepro);
 
-void process1Round(jobData* data, Preprocessor* prepro);
+void process1Round(inpData* data, Preprocessor* prepro);
 
 int sendOut(const char* buffer, unsigned int buffSize, char* fifo);
 
