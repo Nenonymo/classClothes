@@ -82,9 +82,13 @@ void process1Round(inpData* data, Preprocessor* prepro)
     if (blockJob(jobData) != 0) 
     {cout << "Error in the python blocks" << endl; }
 
+    label_data* jobLabels = getBlockOutput(jobData);
+    debugLabelData(jobLabels);
+
     //Clean after the processing
     cleanPictures(data->jobId, prepro);
     delete data;
+    delete jobLabels;
 }
 
 int sendOut(const char* buffer, unsigned int buffSize, char* fifo)

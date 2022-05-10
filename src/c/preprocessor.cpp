@@ -177,9 +177,9 @@ void normalInput(Preprocessor* preprocessor)
     cin >> n;
     for (unsigned int i = 0; i < n; i++)
     {
-        if (i%(n/50) == 0)
+        if (i%(n/80) == 0)
         {
-            cout << "[" << string(((i/(double)n))*50, '|') << string(((1-(i/(double)n))*50), '.') << "}" << endl;
+            cout << "[" << string(((i/(double)n))*80, '#') << string(((1-(i/(double)n))*80), ' ') << "]" << endl;
             //printf("Processing... Please wait. Only %.3f percent left...\n", (1-(i/(double)n))*100);
         }
         cin >> id;
