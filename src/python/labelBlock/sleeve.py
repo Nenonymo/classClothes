@@ -18,7 +18,7 @@ inLabel = sys.argv[3]
 
 #Output, do not modify anything but outString
 outpFile = "Tmp/{}".format(jobId)
-outString = "01 {}\n".format("Robe_chemise")
+outString = "1 {} {}\n".format("3/4", "Manches_evasees")
 fd = os.open(outpFile, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
 os.write(fd, outString.encode('utf-8'))
 os.close(fd)

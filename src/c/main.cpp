@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     {
         cout << "inputing job #" << jobId << endl;
 
+        //Input the job dta from the inFifo
         int outSign;
         inpData* data = new inpData;
         data->jobId = jobId;
