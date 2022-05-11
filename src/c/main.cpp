@@ -24,28 +24,35 @@ int main(int argc, char* argv[])
 
     cout << inFifo << " " << outFifo << endl;
     unsigned int jobId = 0;
-    //sendOut("Server initialized!", 20, outFifo);
-    while (true)
+
+    #pragma omp parallel num_threads(atoi(argv[3]))
     {
-        cout << "inputing job #" << jobId << endl;
+        #pragma omp single
+        {
+            //sendOut("Server initialized!", 20, outFifo);
+            while (true)
+            {
+                cout << "inputing job #" << jobId << endl;
 
-        //Input the job dta from the inFifo
-        int outSign;
-        inpData* data = new inpData;
-        data->jobId = jobId;
-        outSign = processInput(inFifo, outFifo, data);
+                //Input the job dta from the inFifo
+                int outSign;
+                inpData* data = new inpData;
+                data->jobId = jobId;
+                outSign = processInput(inFifo, outFifo, data);
 
-        //If kill signal received or error
-        if (outSign == -1)
-        {break; }
+                //If kill signal received or error
+                if (outSign == -1)
+                {break; }
 
-        //task
-        process1Round(data, &preprocessor);
-        jobId++;
+                //task
+                #pragma omp task
+                process1Round(data, &preprocessor);
+                #pragma omp taskwait
+                jobId++;
+            }
+        }
     }
-
     cout << "Server stopped" << endl;
-
     return 0;
 }
 

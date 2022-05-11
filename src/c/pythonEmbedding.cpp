@@ -16,19 +16,29 @@ int callBlock(job_data* data, string blockPath)
 
 int blockJob(job_data* data)
 {
-    //Section 1
-    if (callBlock(data, "src/python/labelBlock/category.py") != 0) 
-    {cout << "Error in block category" << endl; return -1; }
+    #pragma omp taskgroup
+    {
+        //Task 1
+        #pragma omp task
+        {
+            if (callBlock(data, "src/python/labelBlock/category.py") != 0) 
+            {cout << "Error in block category" << endl; }
+        }
 
-    //Section 2
-    if (callBlock(data, "src/python/labelBlock/sleeve.py") != 0) 
-    {cout << "Error in block sleeve" << endl; return -1; }
+        //Task 2
+        #pragma omp task
+        {
+            if (callBlock(data, "src/python/labelBlock/sleeve.py") != 0) 
+            {cout << "Error in block sleeve" << endl; }
+        }
 
-    //Section 3
-    if (callBlock(data, "src/python/labelBlock/length.py") != 0) 
-    {cout << "Error in block length" << endl; return -1; }
-
-
+        //Task 3
+        #pragma omp task
+        {
+            if (callBlock(data, "src/python/labelBlock/length.py") != 0) 
+            {cout << "Error in block length" << endl; }
+        }
+    }
     return 0;
 }
 

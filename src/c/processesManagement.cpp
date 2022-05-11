@@ -42,7 +42,8 @@ int processInput(char* inFifo, char* outFifo, inpData* data)
 
 
    //Send confirmation of processing to outFifo
-    sendOut("communication received, data queued for processing.", 51, outFifo);
+    string outStr = "Data queued for processing as job #" + to_string(data->jobId) + "     ";
+    sendOut(outStr.c_str(), 41, outFifo);
     return 0;
 }
 
@@ -82,6 +83,7 @@ void process1Round(inpData* data, Preprocessor* prepro)
     if (blockJob(jobData) != 0) 
     {cout << "Error in the python blocks" << endl; }
 
+    //Grab the output of the python blocks
     label_data* jobLabels = getBlockOutput(jobData);
     debugLabelData(jobLabels);
 
