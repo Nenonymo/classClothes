@@ -77,8 +77,12 @@ label_data* getBlockOutput(job_data* inData)
 
 void debugLabelData(label_data* labels)
 {
-    printf("Output of job #%d:\n", labels->jobId);
     printf("\tCategory: %s\n", labels->category.c_str());
-    printf("\tSleeves:\n\t\tCategory: %s\n\t\tLength: %s\n", labels->sleeve.c_str(), labels->sleeveLength.c_str());
+    printf("\tSleeves:\tCategory: %s\tLength: %s\n", labels->sleeve.c_str(), labels->sleeveLength.c_str());
     printf("\tSize: #%d\n", labels->length);
 }
+
+//Code written by:
+//      - Nemo Chentre
+//
+// Last modified: 11/05/2022

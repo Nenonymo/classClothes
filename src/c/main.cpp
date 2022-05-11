@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
             //sendOut("Server initialized!", 20, outFifo);
             while (true)
             {
-                cout << "inputing job #" << jobId << endl;
+                cout << endl << "job #" << jobId << endl;
 
                 //Input the job dta from the inFifo
                 int outSign;
@@ -61,4 +61,4 @@ int main(int argc, char* argv[])
 //Code written by:
 //      - Nemo Chentre
 //
-// Last modified: 29/04/2022
+// Last modified: 11/05/2022

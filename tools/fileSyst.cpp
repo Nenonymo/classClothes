@@ -22,3 +22,12 @@ int createPathIfNotExist(std::string &path)
         return 2;
     }
 }
+
+int rmFile(std::string &path)
+{remove(path.c_str()); return 0; }
+
+
+//Code written by:
+//      - Nemo Chentre
+//
+// Last modified: 11/05/2022

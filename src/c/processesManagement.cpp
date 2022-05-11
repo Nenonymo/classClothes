@@ -88,8 +88,11 @@ void process1Round(inpData* data, Preprocessor* prepro)
     debugLabelData(jobLabels);
 
     //Clean after the processing
-    cleanPictures(data->jobId, prepro);
+    string outLabelFile = prepro->getOutPath() + to_string(jobData->jobId);
+    cleanPictures(jobData->jobId, prepro);
+    rmFile(outLabelFile);
     delete data;
+    delete jobData;
     delete jobLabels;
 }
 
@@ -148,4 +151,4 @@ bool demonize()
 //Code written by:
 //      - Nemo Chentre
 //
-// Last modified: 29/04/2022
+// Last modified: 11/05/2022

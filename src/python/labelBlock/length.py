@@ -22,3 +22,9 @@ outString = "2 {}\n".format(4)
 fd = os.open(outpFile, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
 os.write(fd, outString.encode('utf-8'))
 os.close(fd)
+
+
+#Code written by:
+#      - Nemo Chentre
+#
+# Last modified: 11/05/2022
