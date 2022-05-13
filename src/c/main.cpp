@@ -9,12 +9,18 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     //Demonize
-
+    printf("Started\n");
     //input data from named pipe
     char* inFifo = argv[1];
     mkfifo(inFifo, 0666);
     char* outFifo = argv[2];
     mkfifo(outFifo, 0666);
+    //Open the pipes
+    //Open the input fifo
+    int fdi = 0;
+    fdi = open(inFifo, O_RDONLY);
+    if (fdi <= 0) 
+    {printf("Error, could not open the input fifo"); return -1; }
 
     cout << "\033]0;Labeller-Server\007" << endl;
 
@@ -38,7 +44,7 @@ int main(int argc, char* argv[])
                 int outSign;
                 inpData* data = new inpData;
                 data->jobId = jobId;
-                outSign = processInput(inFifo, outFifo, data);
+                outSign = processInput(fdi, outFifo, data);
 
                 //If kill signal received or error
                 if (outSign == -1)

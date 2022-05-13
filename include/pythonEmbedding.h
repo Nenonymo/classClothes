@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-#define BUFF_SIZE 120
+#define PY_BUFF_SIZE 120
 #define NB_BLOCK 3
 
 typedef struct job_data

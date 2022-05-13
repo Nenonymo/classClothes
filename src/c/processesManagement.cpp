@@ -4,21 +4,15 @@ using namespace std;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo, inpData* data)
+int processInput(int inFifo, const char* outFifo, inpData* data)
 {
-   //Input data
-    //Open the input fifo
-    int fdi = 0;
-    fdi = open(inFifo, O_RDONLY, O_NONBLOCK);
-    if (fdi <= 0) 
-    {
-        cout << "Error, could not open the input fifo" << endl;
-        return -1;
-    }
-    
+   //Input data    
     //Input the data from the in Fifo
     char cBuff[BUFF_SIZE];
-    read(fdi, cBuff, BUFF_SIZE);
+    cBuff[0] = 36;
+    //Loop over the fifo reading to avoid fake communications
+    do {read(inFifo, cBuff, BUFF_SIZE); } while (cBuff[0] == 36);
+    cout << "buffer: " << cBuff << endl;
     stringstream buffer;
     buffer << cBuff; //Transform the buffer into a stream
 
@@ -32,6 +26,7 @@ int processInput(char* inFifo, char* outFifo, inpData* data)
     if (signal == 1) //Kill signal
     {
         killProcess();
+        close(inFifo);
         sendOut("server shutdowned.", 18, outFifo);
         return -1; 
     }
@@ -96,15 +91,15 @@ void process1Round(inpData* data, Preprocessor* prepro)
     delete jobLabels;
 }
 
-int sendOut(const char* buffer, unsigned int buffSize, char* fifo)
+int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo)
 {
+    //Open the output fifo
+    printf("opening out fifo\n");
     int fdo = 0;
-    fdo = open(fifo, O_WRONLY);
+    fdo = open(outFifo, O_WRONLY);
     if (fdo <= 0)
-    {
-        cout << "Error, could not open the output fifo" << endl;
-        return -1;
-    }
+    {printf("Error, could not open the output fifo"); return -1; }
+
     write(fdo, buffer, buffSize);
     close(fdo);
     return 0;

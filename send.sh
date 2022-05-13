@@ -37,7 +37,8 @@ if [[ "$serverStart" == 1 ]]; then
 fi
 
 #Send data to the server
-echo "$serverKill $filePath $fileArg" > $inFifo;
+echo "Sending...";
+echo "$serverKill $filePath $fileArg" >> $inFifo;
 echo `cat $outFifo`;
 
 if [[ "$serverKill" == 1 ]]; then

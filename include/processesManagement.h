@@ -11,7 +11,7 @@
 #include "preprocessor.h"
 #include "pythonEmbedding.h"
 
-#define BUFF_SIZE 120
+#define BUFF_SIZE 160
 
 struct inpData
 {
@@ -23,7 +23,7 @@ typedef struct inpData inpData;
 
 int killProcess();
 
-int processInput(char* inFifo, char* outFifo, inpData* data);
+int processInput(int inFifo, const char* outFifo, inpData* data);
 
 void input1Round(std::stringstream& buffer, inpData* data);
 
@@ -31,7 +31,7 @@ void cleanPictures(unsigned int jobId, Preprocessor* prepro);
 
 void process1Round(inpData* data, Preprocessor* prepro);
 
-int sendOut(const char* buffer, unsigned int buffSize, char* fifo);
+int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo);
 
 bool demonize();
 
