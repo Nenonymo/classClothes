@@ -23,10 +23,10 @@ LCVFLAGS = `pkg-config --libs opencv4`
 
 #Include & local libs flags
 IFLAGS = -I${INC} -I${TOOL}
-LFLAGS = -lstdc++
+LFLAGS = -lstdc++ -fopenmp
 
 #Compiling flags
-CXXFLAGS = ${DBFLAGS} ${WFLAGS} ${IFLAGS} ${CVFLAGS}
+CXXFLAGS = ${DBFLAGS} ${WFLAGS} ${IFLAGS} ${CVFLAGS} ${LFLAGS}
 LDFLAGS = $(LCVFLAGS)
 
 all: $(TARGET)

@@ -33,7 +33,6 @@ short unsigned* simplifyBbox(short unsigned* bbox);
 
 cv::Mat resizeKeepRatio(cv::Mat image, short unsigned* size);
 
-void normalInput(Preprocessor* preprocessor);
 void csvInput(Preprocessor* preprocessor, std::string path);
 
 
