@@ -8,3 +8,4 @@ extra/preprocessor
 
 src/python/.ipynb_checkpoints
 src/python/experimenting/.ipynb_checkpoints
+src/python/__pycache__/*
