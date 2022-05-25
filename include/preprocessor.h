@@ -3,7 +3,6 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include <iostream>
 #include <fstream>
 #include <algorithm>
 

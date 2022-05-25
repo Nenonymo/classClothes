@@ -1,14 +1,16 @@
 #include "processesManagement.h"
 #include "preprocessor.h"
+#include "nnEmbedding.h"
 
 using namespace std;
 
 #define INPUT_PREFIX "data/Datasets_Enhancy/datasets/"
 #define OUTPUT_PREFIX "Tmp/"
 
+#define BBOX_MODEL "models/bboxRegressor.json"
+
 int main(int argc, char* argv[])
 {
-    //Demonize
     printf("Started\n");
     //input data from named pipe
     char* inFifo = argv[1];
@@ -27,6 +29,9 @@ int main(int argc, char* argv[])
     //Start preprocessor
     unsigned short size[] = {128, 128};
     Preprocessor preprocessor(size, INPUT_PREFIX, OUTPUT_PREFIX);
+
+    //Start the bbox regressor
+    NNetwork regressor = NNetwork(128*128*3, 4, BBOX_MODEL);
 
     cout << inFifo << " " << outFifo << endl;
     unsigned int jobId = 0;
