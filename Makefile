@@ -17,7 +17,7 @@ OBJS = $(SRC)/wavelet.o \
 CXX = g++
 
 #Compiler flags
-DBFLAGS = -O2
+DBFLAGS = -O3
 WFLAGS = -Wall -std=c++17 #Wall flag 
 
 #OpenCV Flags

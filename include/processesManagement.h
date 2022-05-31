@@ -10,8 +10,10 @@
 
 #include "preprocessor.h"
 #include "pythonEmbedding.h"
+#include "nnEmbedding.h"
+#include "fileSyst.h"
 
-#define BUFF_SIZE 160
+#define BUFF_SIZE 200
 
 struct inpData
 {
@@ -21,17 +23,17 @@ struct inpData
 };
 typedef struct inpData inpData;
 
-int killProcess();
+inline int killProcess();
 
 int processInput(int inFifo, const char* outFifo, inpData* data);
 
-void input1Round(std::stringstream& buffer, inpData* data);
+inline void input1Round(std::stringstream& buffer, inpData* data);
 
-void cleanPictures(unsigned int jobId, Preprocessor* prepro);
+inline void cleanPictures(unsigned int jobId, Preprocessor* prepro);
 
-void process1Round(inpData* data, Preprocessor* prepro);
+void process1Round(inpData* data, Preprocessor* prepro, BBoxNN* bboxReg, unsigned int* jobA);
 
-int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo);
+inline int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo);
 
 bool demonize();
 

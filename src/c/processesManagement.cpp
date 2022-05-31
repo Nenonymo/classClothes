@@ -12,8 +12,8 @@ int processInput(int inFifo, const char* outFifo, inpData* data)
     cBuff[0] = 36;
     //Loop over the fifo reading to avoid fake communications
     do {read(inFifo, cBuff, BUFF_SIZE); } while (cBuff[0] == 36);
-    cout << "buffer: " << cBuff << endl;
     stringstream buffer;
+    cout << cBuff << endl;
     buffer << cBuff; //Transform the buffer into a stream
 
     //Process the signal attached to the communication
@@ -28,7 +28,7 @@ int processInput(int inFifo, const char* outFifo, inpData* data)
         killProcess();
         close(inFifo);
         sendOut("server shutdowned.", 18, outFifo);
-        return -1; 
+        return -1;
     }
     else if (signal != 0) //Yet unedefined signal
     {return -1; }
@@ -42,13 +42,13 @@ int processInput(int inFifo, const char* outFifo, inpData* data)
     return 0;
 }
 
-void input1Round(stringstream& buffer, inpData* data)
+inline void input1Round(stringstream& buffer, inpData* data)
 {
     buffer >> data->picturePath;
     buffer >> data->labelClass;
 }
 
-void cleanPictures(unsigned int jobId, Preprocessor* prepro)
+inline void cleanPictures(unsigned int jobId, Preprocessor* prepro)
 {
     string outP = prepro->getOutPath();
     string filename = outP + "gray_" + to_string(jobId) + ".bmp";
@@ -61,37 +61,57 @@ void cleanPictures(unsigned int jobId, Preprocessor* prepro)
     remove(filename.c_str());
 }
 
-void process1Round(inpData* data, Preprocessor* prepro)
+void process1Round(inpData* data, Preprocessor* prepro, BBoxNN* bboxReg, unsigned int* jobA)
 {
+
     //Preprocessing
-    //printf("processing picture %s with arg %s\n", data->picturePath.c_str(), data->labelClass.c_str());
-    prepro->processWithoutBbox(data->jobId, data->picturePath);
-    //printf("Picture preprocessed\n");
+    std::string picPath = prepro->getInPath() + data->picturePath;
+    if (doesPathExist(picPath) == true) 
+    {
+        unsigned short* bbox = bboxReg->predict(picPath.c_str());
 
-    //Prepare the data for the job
-    job_data* jobData = new job_data;
-    jobData->jobId = data->jobId;
-    jobData->tempDir = prepro->getOutPath().c_str();
-    jobData->givenLabel = data->labelClass.c_str();
+        //printf("processing picture %s with arg %s\n", data->picturePath.c_str(), data->labelClass.c_str());
+        prepro->processWithoutBbox(data->jobId, data->picturePath);
+        //printf("Picture preprocessed\n");
 
-    //Process the job in the python blocks
-    if (blockJob(jobData) != 0) 
-    {cout << "Error in the python blocks" << endl; }
+        //Prepare the data for the job
+        job_data* jobData = new job_data;
+        jobData->jobId = data->jobId;
+        jobData->tempDir = prepro->getOutPath().c_str();
+        jobData->givenLabel = data->labelClass.c_str();
 
-    //Grab the output of the python blocks
-    label_data* jobLabels = getBlockOutput(jobData);
-    debugLabelData(jobLabels);
+        //Predict with the saved nn :/
 
-    //Clean after the processing
-    string outLabelFile = prepro->getOutPath() + to_string(jobData->jobId);
-    cleanPictures(jobData->jobId, prepro);
-    rmFile(outLabelFile);
-    delete data;
-    delete jobData;
-    delete jobLabels;
+
+        /*//Python blocks for predicting with the models, not used anymore
+        //Since we embedded the nn directly in c++
+        //Process the job in the python blocks
+        if (blockJob(jobData) != 0) 
+        {cout << "Error in the python blocks" << endl; }
+        //Grab the output of the python blocks
+        label_data* jobLabels = getBlockOutput(jobData);
+        debugLabelData(jobLabels);*/
+
+        //Clean after the processing
+        string outLabelFile = prepro->getOutPath() + to_string(jobData->jobId);
+        cleanPictures(jobData->jobId, prepro);
+        rmFile(outLabelFile);
+        delete data;
+        delete jobData;
+        //delete jobLabels;
+        delete[] bbox;
+
+        #pragma omp critical
+        {*jobA = *jobA - 1; }
+    }
+    else
+    {
+        cout << "Picture not found, sorry :/\n" << endl;
+        delete data;
+    }
 }
 
-int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo)
+inline int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo)
 {
     //Open the output fifo
     printf("opening out fifo\n");
@@ -105,7 +125,7 @@ int sendOut(const char* buffer, unsigned int buffSize, const char* outFifo)
     return 0;
 }
 
-void raiseError(char* buffer)
+inline void raiseError(char* buffer)
 {
     cout << buffer << endl;
     killProcess();
@@ -116,7 +136,7 @@ void raiseFatalError()
     //Do something
 }
 
-int killProcess()
+inline int killProcess()
 {
     return 0;
 }

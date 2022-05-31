@@ -1,0 +1,12 @@
+Required libs in C:
+opencv2
+frugallydeep (fdeep)
+eigen
+openmp
+
+
+Required libs in python
+tensorflow
+keras
+pandas
+numpy

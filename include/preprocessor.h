@@ -17,6 +17,7 @@ class Preprocessor
         void processWithoutBbox(unsigned int id, std::string path);
 
         std::string getOutPath();
+        std::string getInPath();
     private:
         //Innit args
         unsigned short* size;

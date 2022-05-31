@@ -16,6 +16,7 @@ Preprocessor::Preprocessor(unsigned short _size[2], string inP, string outP)
 }
 
 string Preprocessor::getOutPath() {return this->outPrefix; }
+string Preprocessor::getInPath() {return this->inPrefix; }
 
 void Preprocessor::process(unsigned int id, string path, unsigned short* rawBbox)
 {

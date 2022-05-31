@@ -7,11 +7,15 @@ using namespace std;
 #define INPUT_PREFIX "data/Datasets_Enhancy/datasets/"
 #define OUTPUT_PREFIX "Tmp/"
 
-#define BBOX_MODEL "models/bboxRegressor.json"
-
 int main(int argc, char* argv[])
 {
-    printf("Started\n");
+    //Start the bbox regressor
+    BBoxNN bbReg;
+    //Start preprocessor
+    unsigned short size[] = {128, 128};
+    Preprocessor preprocessor(size, INPUT_PREFIX, OUTPUT_PREFIX);
+    
+    printf("Started with %d threads\n", atoi(argv[3]));
     //input data from named pipe
     char* inFifo = argv[1];
     mkfifo(inFifo, 0666);
@@ -26,15 +30,10 @@ int main(int argc, char* argv[])
 
     cout << "\033]0;Labeller-Server\007" << endl;
 
-    //Start preprocessor
-    unsigned short size[] = {128, 128};
-    Preprocessor preprocessor(size, INPUT_PREFIX, OUTPUT_PREFIX);
-
-    //Start the bbox regressor
-    NNetwork regressor = NNetwork(128*128*3, 4, BBOX_MODEL);
 
     cout << inFifo << " " << outFifo << endl;
     unsigned int jobId = 0;
+    unsigned int jobAmount = 0;
 
     #pragma omp parallel num_threads(atoi(argv[3]))
     {
@@ -43,7 +42,13 @@ int main(int argc, char* argv[])
             //sendOut("Server initialized!", 20, outFifo);
             while (true)
             {
+                //Avoid creating 5000 tasks (will result in a crash of the main app)
+                //do {/*wait a bit*/ } while (jobAmount >= 16);
+
                 cout << endl << "job #" << jobId << endl;
+
+                #pragma omp critical
+                {jobAmount++; }
 
                 //Input the job dta from the inFifo
                 int outSign;
@@ -56,9 +61,10 @@ int main(int argc, char* argv[])
                 {break; }
 
                 //task
+                
                 #pragma omp task
-                process1Round(data, &preprocessor);
-                #pragma omp taskwait
+                {process1Round(data, &preprocessor, &bbReg, &jobAmount); }
+
                 jobId++;
             }
         }

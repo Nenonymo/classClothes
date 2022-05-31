@@ -1,3 +1,5 @@
+#pragma once
+
 #include <fdeep/fdeep.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -5,13 +7,22 @@
 
 #define BBOX_MODEL "models/bboxRegressor.json"
 
-class NNetwork
+class BBoxNN
 {
     public:
-        NNetwork(unsigned int dimIn, unsigned int dimOut, char* path);
-        unsigned short* predict(char* inFilePath);
+        BBoxNN();
+        unsigned short* predict(const char* inFilePath);
 
     private:
-        unsigned int dimIn, dimOut;
+        fdeep::model myModel = fdeep::load_model(BBOX_MODEL);
+};
+
+class ClassNN
+{
+    public:
+        ClassNN();
+        unsigned int* predict(const char* inFilePath);
+
+    private:
         fdeep::model myModel = fdeep::load_model(BBOX_MODEL);
 };
